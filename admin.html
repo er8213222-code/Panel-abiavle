@@ -1,0 +1,42 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SOFI ADMIN</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#09040d;color:#fff;font-family:Courier New,monospace}.wrap{max-width:900px;margin:auto;padding:16px}h1,h2{color:#ff43c4}.card{border:4px solid #8f2c79;background:#140914;padding:16px;margin:14px 0}button{border:3px solid #7d155f;background:#ff43c4;color:#fff;font-weight:900;padding:10px 14px;margin:5px;box-shadow:4px 4px #3a102f}input,textarea,select{width:100%;padding:10px;background:#09040d;color:#fff;border:3px solid #8f2c79;margin:5px 0 10px}textarea{min-height:90px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.status{padding:8px;border:3px solid #50ff8b;color:#50ff8b}.room{border:2px solid #69305e;padding:10px;margin:10px 0}.sel{background:#7d155f}@media(max-width:600px){.grid{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<h1>SOFI GAME — ADMIN</h1><div id="status" class="status">● Conectando...</div>
+<div class="card"><h2>🎮 Niveles</h2><div id="levels"></div><button id="add">+ AGREGAR NIVEL</button><button id="saveLevels">GUARDAR NIVELES</button></div>
+<div class="card"><h2>❓ Encuesta</h2><textarea id="question" placeholder="Pregunta"></textarea><div class="grid"><input id="a" placeholder="A"><input id="b" placeholder="B"><input id="c" placeholder="C"><input id="d" placeholder="D"></div><select id="correct"><option value="">Sin respuesta correcta</option><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select><button id="saveSurvey">PUBLICAR</button><button id="clearSurvey">QUITAR</button></div>
+<div class="card"><h2>💬 Mensaje</h2><textarea id="message" placeholder="Mensaje para Sofi"></textarea><input id="duration" type="number" min="0" max="60" value="5"><button id="send">MOSTRAR MENSAJE</button></div>
+<div class="card"><h2>🚨 ADMIN ABUSE</h2><p>5 habitaciones · 3 puertas · 5 vidas</p><div id="rooms"></div><button id="saveDoors">GUARDAR PUERTAS</button><button id="activate">ACTIVAR ADMIN ABUSE</button></div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBAw-UrRmhMIldpEE7kPbbpmUA034oTcrE",
+  authDomain: "sofi-game.firebaseapp.com",
+  projectId: "sofi-game",
+  storageBucket: "sofi-game.firebasestorage.app",
+  messagingSenderId: "322701500655",
+  appId: "1:322701500655:web:36399b7d5575a4223cbb1a",
+  measurementId: "G-XGXF5V5EPS"
+};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore(),ref=db.collection("sofiGame").doc("control");
+let data={levels:["Tras Tiendas 0","Caída a Vecindario","Escaleras Interminables","Hotel","Pasillos Susurrantes","Poolrooms","Backrooms Espejo","Paisaje","Hello Kitty","Hello Kitty Garden","Ojos 3.14","Simulación","Nivel Fun","Roba un Brainrot","Bosque","Pisos Flotantes"],survey:null,message:null,surprise:{enabled:false,doors:[1,2,3,1,2]}};
+const $=id=>document.getElementById(id);
+ref.onSnapshot(s=>{if(s.exists())data={...data,...s.data()};render();$("status").textContent="● Firebase conectado";});
+async function save(){await ref.set(data);$("status").textContent="● Guardado en Firebase";}
+function render(){
+ $("levels").innerHTML=data.levels.map((n,i)=>`<div><b>${i+1}.</b> <input value="${esc(n)}"></div>`).join("");
+ $("rooms").innerHTML=data.surprise.doors.map((v,i)=>`<div class="room"><b>HABITACIÓN ${i+1}</b><br>${[1,2,3].map(n=>`<button class="${v===n?"sel":""}" onclick="door(${i},${n})">PUERTA ${n}</button>`).join("")}</div>`).join("");
+ if(data.survey){$("question").value=data.survey.question||"";["a","b","c","d"].forEach((id,i)=>$(id).value=data.survey.options?.[i]||"");$("correct").value=data.survey.correct??"";}
+}
+$("add").onclick=()=>{data.levels.push("Nuevo nivel");render()};
+$("saveLevels").onclick=()=>{data.levels=[...document.querySelectorAll("#levels input")].map(x=>x.value.trim()).filter(Boolean);save()};
+$("saveSurvey").onclick=()=>{data.survey={question:$("question").value.trim(),options:[$("a").value,$("b").value,$("c").value,$("d").value],correct:$("correct").value};save()};
+$("clearSurvey").onclick=()=>{data.survey=null;save()};
+$("send").onclick=()=>{data.message={text:$("message").value.trim(),duration:Number($("duration").value)||0,id:Date.now()};save()};
+window.door=(i,n)=>{data.surprise.doors[i]=n;render()};
+$("saveDoors").onclick=()=>save();
+$("activate").onclick=()=>{data.surprise={...data.surprise,enabled:true,id:Date.now()};save()};
+function esc(s){return String(s??"").replace(/"/g,"&quot;")}
+render();
+</script></body></html>
