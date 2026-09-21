@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOFI GAME</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    image-rendering:pixelated;
+}
+
+body{
+    margin:0;
+    background:#08050d;
+    color:white;
+    font-family:"Courier New",monospace;
+    overflow:hidden;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.screen{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+}
+
+/* ================= INICIO ================= */
+
+#inicio{
+    background:#0d0713;
+}
+
+.logo{
+    color:#ff4dcc;
+    font-size:44px;
+    font-weight:bold;
+    text-shadow:4px 4px #74115c;
+    margin-bottom:30px;
+}
+
+.pixel-btn{
+    background:#ff4dcc;
+    color:white;
+    border:4px solid #8c176f;
+    padding:13px 25px;
+    margin:7px;
+    font-family:"Courier New",monospace;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:6px 6px #35102d;
+}
+
+.pixel-btn:active{
+    transform:translate(4px,4px);
+    box-shadow:2px 2px #35102d;
+}
+
+/* ================= CASA ================= */
+
+#casa{
+    width:100vw;
+    height:100vh;
+    position:relative;
+
+    /* Pon tu imagen de la casa en la misma carpeta */
+    background-image:url("casa.png");
+    background-size:cover;
+    background-position:center;
+}
+
+.vidas{
+    position:absolute;
+    top:12px;
+    left:12px;
+    padding:8px 12px;
+    background:#000c;
+    border:3px solid #ff4dcc;
+    font-size:21px;
+    z-index:10;
+}
+
+.casa-botones{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:20px;
+    display:flex;
+    justify-content:space-between;
+    padding:0 20px;
+}
+
+.icon-btn{
+    width:70px;
+    height:70px;
+    background:#ff4dcc;
+    border:4px solid #8c176f;
+    color:white;
+    font-size:30px;
+    font-weight:bold;
+    box-shadow:5px 5px #35102d;
+    cursor:pointer;
+}
+
+/* ================= BACKROOMS ================= */
+
+#backrooms{
+    background:#09060d;
+    overflow:auto;
+    padding:20px;
+    justify-content:flex-start;
+}
+
+.titulo{
+    color:#ff4dcc;
+    font-size:34px;
+    font-weight:bold;
+    text-shadow:4px 4px #701356;
+    margin-bottom:15px;
+}
+
+.volver{
+    align-self:flex-start;
+}
+
+.mapa{
+    width:min(600px,95vw);
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin:10px auto 40px;
+}
+
+.nivel{
+    min-height:75px;
+    background:#25152e;
+    border:3px solid #ff4dcc;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:8px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+/* ================= ENCUESTA ================= */
+
+#encuesta{
+    background:#0e0715;
+    padding:20px;
+}
+
+.encuesta-box{
+    width:min(500px,92vw);
+    background:#1b1024;
+    border:4px solid #ff4dcc;
+    padding:25px;
+    box-shadow:8px 8px #35102d;
+}
+
+.encuesta-pregunta{
+    font-size:21px;
+    margin:20px 0;
+}
+
+.opciones{
+    display:flex;
+    flex-direction:column;
+}
+
+/* ================= OVERLAYS ================= */
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:#000e;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+}
+
+.modal{
+    width:min(500px,94vw);
+    background:#160b1e;
+    border:5px solid #ff4dcc;
+    padding:25px;
+    text-align:center;
+    box-shadow:10px 10px #350f2e;
+}
+
+/* ================= ADMIN ABUSE ================= */
+
+.admin-abuse{
+    color:red;
+    font-size:clamp(40px,12vw,90px);
+    font-weight:bold;
+    text-shadow:5px 5px #5b0000;
+    animation:abuse .55s infinite alternate;
+}
+
+@keyframes abuse{
+    from{
+        transform:scale(.55);
+    }
+
+    to{
+        transform:scale(1.15);
+    }
+}
+
+/* ================= PUERTAS ================= */
+
+.puertas{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.puerta{
+    width:90px;
+    height:150px;
+    background:#702b70;
+    border:5px solid #ff4dcc;
+    color:white;
+    font-family:"Courier New",monospace;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:6px 6px #35102d;
+}
+
+.puerta:active{
+    transform:translate(4px,4px);
+    box-shadow:2px 2px #35102d;
+}
+
+.sorpresa-titulo{
+    color:#ff72dc;
+}
+
+/* ================= VIGILANCIA ================= */
+
+.vigilancia-titulo{
+    color:#ff4dcc;
+    font-size:30px;
+}
+</style>
+</head>
+
+<body>
+
+
+<!-- =====================================================
+                     INICIO
+===================================================== -->
+
+<section id="inicio" class="screen">
+
+    <div class="logo">
+        SOFI GAME
+    </div>
+
+    <button class="pixel-btn" onclick="jugar()">
+        JUEGA
+    </button>
+
+    <button class="pixel-btn" onclick="morir()">
+        MUERE
+    </button>
+
+    <div style="font-size:35px;">
+        0
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+                     CASA
+===================================================== -->
+
+<section id="casa" class="hidden">
+
+    <div class="vidas" id="vidas">
+        ❤️❤️❤️❤️❤️
+    </div>
+
+    <div class="casa-botones">
+
+        <!-- BOTÓN BACKROOMS -->
+        <button class="icon-btn" onclick="abrirBackrooms()">
+            ☠
+        </button>
+
+        <!-- BOTÓN ENCUESTA -->
+        <button class="icon-btn" onclick="abrirEncuesta()">
+            ?
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+                     BACKROOMS
+===================================================== -->
+
+<section id="backrooms" class="screen hidden">
+
+    <button class="pixel-btn volver" onclick="volverCasa()">
+        ← VOLVER
+    </button>
+
+    <div class="titulo">
+        BACKROOMS
+    </div>
+
+    <div id="mapa" class="mapa"></div>
+
+</section>
+
+
+<!-- =====================================================
+                     ENCUESTA
+===================================================== -->
+
+<section id="encuesta" class="screen hidden">
+
+    <button class="pixel-btn volver" onclick="volverCasa()">
+        ← VOLVER
+    </button>
+
+    <div class="encuesta-box">
+
+        <h2>
+            ENCUESTA
+        </h2>
+
+        <!--
+        ESTA PARTE ESTÁ VACÍA INTENCIONALMENTE.
+
+        El panel de Emiliano será quien coloque:
+        - La pregunta
+        - Las opciones
+        - Y opcionalmente la respuesta correcta
+        -->
+
+        <div id="encuestaContenido">
+
+            <div class="encuesta-pregunta">
+                Esperando encuesta...
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+                  ADMIN ABUSE
+===================================================== -->
+
+<div id="abuse" class="overlay hidden">
+
+    <div class="admin-abuse">
+        ADMIN ABUSE!
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+                    SORPRESA
+===================================================== -->
+
+<div id="sorpresa" class="overlay hidden">
+
+    <div class="modal">
+
+        <h2 class="sorpresa-titulo">
+            HABITACIÓN <span id="habitacion">1</span>
+        </h2>
+
+        <p>
+            Elige una puerta
+        </p>
+
+        <div class="puertas">
+
+            <button class="puerta" onclick="elegirPuerta(1)">
+                🚪<br><br>
+                PUERTA 1
+            </button>
+
+            <button class="puerta" onclick="elegirPuerta(2)">
+                🚪<br><br>
+                PUERTA 2
+            </button>
+
+            <button class="puerta" onclick="elegirPuerta(3)">
+                🚪<br><br>
+                PUERTA 3
+            </button>
+
+        </div>
+
+        <p id="vidasSorpresa">
+            ❤️❤️❤️❤️❤️
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+                 PERDIÓ UNA VIDA
+===================================================== -->
+
+<div id="perdida" class="overlay hidden">
+
+    <div class="modal">
+
+        <h1>
+            HAS PERDIDO UNA VIDA
+        </h1>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+                 VIGILANCIA
+===================================================== -->
+
+<div id="vigilancia" class="overlay hidden">
+
+    <div class="modal">
+
+        <h1 class="vigilancia-titulo">
+            EMILIANO TE VIGILARÁ
+        </h1>
+
+        <p id="fechas"></p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+                      MUERE
+===================================================== -->
+
+<div id="muere" class="overlay hidden">
+
+    <div class="modal">
+
+        <h1>
+            TE VA A VIGILAR EMILIANO
+            DURANTE 2 HORAS
+        </h1>
+
+        <button class="pixel-btn" onclick="cerrarMuere()">
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+                     NIVELES
+===================================================== */
+
+const niveles = [
+
+    "Tras Tiendas 0",
+    "Caída a Vecindario",
+    "Escaleras Interminables",
+    "Hotel",
+    "Pasillos Susurrantes",
+    "Poolrooms",
+    "Backrooms Espejo",
+    "Paisaje",
+    "Hello Kitty",
+    "Hello Kitty Garden",
+    "Ojos 3.14",
+    "Simulación",
+    "Nivel Fun",
+    "Roba un Brainrot",
+    "Bosque",
+    "Pisos Flotantes"
+
+];
+
+const mapa =
+    document.getElementById("mapa");
+
+niveles.forEach((nivel,index)=>{
+
+    const elemento =
+        document.createElement("div");
+
+    elemento.className="nivel";
+
+    elemento.textContent =
+        (index+1)+". "+nivel;
+
+    mapa.appendChild(elemento);
+
+});
+
+
+/* =====================================================
+                  CAMBIO DE PANTALLAS
+===================================================== */
+
+function ocultarPantallas(){
+
+    document
+        .querySelectorAll(
+            "#inicio,#casa,#backrooms,#encuesta"
+        )
+        .forEach(elemento=>{
+            elemento.classList.add("hidden");
+        });
+
+}
+
+
+function jugar(){
+
+    ocultarPantallas();
+
+    document
+        .getElementById("casa")
+        .classList.remove("hidden");
+
+}
+
+
+function volverCasa(){
+
+    ocultarPantallas();
+
+    document
+        .getElementById("casa")
+        .classList.remove("hidden");
+
+}
+
+
+function abrirBackrooms(){
+
+    ocultarPantallas();
+
+    document
+        .getElementById("backrooms")
+        .classList.remove("hidden");
+
+}
+
+
+function abrirEncuesta(){
+
+    ocultarPantallas();
+
+    document
+        .getElementById("encuesta")
+        .classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+                      MUERE
+===================================================== */
+
+function morir(){
+
+    document
+        .getElementById("muere")
+        .classList.remove("hidden");
+
+}
+
+
+function cerrarMuere(){
+
+    document
+        .getElementById("muere")
+        .classList.add("hidden");
+
+}
+
+
+/* =====================================================
+                 SORPRESA
+===================================================== */
+
+let vidas=5;
+
+let habitacion=1;
+
+
+/*
+    CORRECTAS DE LAS 5 HABITACIONES.
+
+    Habitación 1 → puerta 1
+    Habitación 2 → puerta 2
+    Habitación 3 → puerta 3
+    Habitación 4 → puerta 1
+    Habitación 5 → puerta 2
+
+    Más adelante esto NO se tendrá que escribir aquí:
+    lo controlará el panel de Emiliano.
+*/
+
+const puertasCorrectas=[
+    1,
+    2,
+    3,
+    1,
+    2
+];
+
+
+function actualizarVidas(){
+
+    const corazones=
+        "❤️".repeat(vidas);
+
+    const vacias=
+        "🖤".repeat(5-vidas);
+
+    document
+        .getElementById("vidas")
+        .textContent=
+        corazones+vacias;
+
+    document
+        .getElementById("vidasSorpresa")
+        .textContent=
+        corazones+vacias;
+
+}
+
+
+/*
+    ESTA FUNCIÓN SERÁ ACTIVADA
+    POR EL PANEL DE EMILIANO.
+*/
+
+function activarSorpresa(){
+
+    document
+        .getElementById("abuse")
+        .classList.remove("hidden");
+
+
+    setTimeout(()=>{
+
+        document
+            .getElementById("abuse")
+            .classList.add("hidden");
+
+
+        habitacion=1;
+
+        document
+            .getElementById("habitacion")
+            .textContent=
+            habitacion;
+
+
+        document
+            .getElementById("sorpresa")
+            .classList.remove("hidden");
+
+
+        actualizarVidas();
+
+    },2200);
+
+}
+
+
+function elegirPuerta(numero){
+
+    const correcta=
+        puertasCorrectas[habitacion-1];
+
+
+    /* =================
+       PUERTA CORRECTA
+    ================= */
+
+    if(numero===correcta){
+
+        sonidoCorrecto();
+
+
+        if(habitacion<5){
+
+            /*
+                Pasa a otra habitación
+                con otras 3 puertas.
+            */
+
+            habitacion++;
+
+
+            document
+                .getElementById("habitacion")
+                .textContent=
+                habitacion;
+
+        }
+
+        else{
+
+            /*
+                Completó las 5 habitaciones.
+            */
+
+            document
+                .getElementById("sorpresa")
+                .classList.add("hidden");
+
+        }
+
+        return;
+
+    }
+
+
+    /* =================
+       PUERTA INCORRECTA
+    ================= */
+
+    vidas--;
+
+    actualizarVidas();
+
+    sonidoIncorrecto();
+
+
+    document
+        .getElementById("sorpresa")
+        .classList.add("hidden");
+
+
+    /* =================
+       PERDIÓ LAS 5
+    ================= */
+
+    if(vidas<=0){
+
+        mostrarVigilancia();
+
+        return;
+
+    }
+
+
+    /* =================
+       PERDIÓ UNA VIDA
+    ================= */
+
+    document
+        .getElementById("perdida")
+        .classList.remove("hidden");
+
+
+    setTimeout(()=>{
+
+        document
+            .getElementById("perdida")
+            .classList.add("hidden");
+
+
+        /*
+            Continúa con la siguiente habitación.
+        */
+
+        if(habitacion<5){
+
+            habitacion++;
+
+            document
+                .getElementById("habitacion")
+                .textContent=
+                habitacion;
+
+        }
+
+
+        document
+            .getElementById("sorpresa")
+            .classList.remove("hidden");
+
+
+    },1400);
+
+}
+
+
+/* =====================================================
+                    VIGILANCIA
+===================================================== */
+
+function mostrarVigilancia(){
+
+    const hoy=
+        new Date();
+
+
+    const fecha1=
+        new Date(hoy);
+
+    fecha1.setDate(
+        hoy.getDate()+1
+    );
+
+
+    const fecha2=
+        new Date(hoy);
+
+    fecha2.setDate(
+        hoy.getDate()+2
+    );
+
+
+    const opciones={
+        day:"numeric",
+        month:"long"
+    };
+
+
+    document
+        .getElementById("fechas")
+        .textContent=
+        "Del "+
+        fecha1.toLocaleDateString(
+            "es-MX",
+            opciones
+        )+
+        " al "+
+        fecha2.toLocaleDateString(
+            "es-MX",
+            opciones
+        );
+
+
+    document
+        .getElementById("vigilancia")
+        .classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+                       SONIDOS
+===================================================== */
+
+function sonido(
+    frecuencia,
+    duracion,
+    tipo
+){
+
+    try{
+
+        const audio=
+            new AudioContext();
+
+        const oscilador=
+            audio.createOscillator();
+
+        const ganancia=
+            audio.createGain();
+
+
+        oscilador.type=
+            tipo;
+
+        oscilador.frequency.value=
+            frecuencia;
+
+        ganancia.gain.value=.12;
+
+
+        oscilador.connect(
+            ganancia
+        );
+
+        ganancia.connect(
+            audio.destination
+        );
+
+
+        oscilador.start();
+
+
+        ganancia.gain
+            .exponentialRampToValueAtTime(
+                .001,
+                audio.currentTime+
+                duracion
+            );
+
+
+        oscilador.stop(
+            audio.currentTime+
+            duracion
+        );
+
+    }catch(error){}
+
+}
+
+
+function sonidoCorrecto(){
+
+    sonido(
+        600,
+        .15,
+        "square"
+    );
+
+}
+
+
+function sonidoIncorrecto(){
+
+    sonido(
+        90,
+        .3,
+        "sawtooth"
+    );
+
+
+    setTimeout(()=>{
+
+        sonido(
+            50,
+            .3,
+            "square"
+        );
+
+    },120);
+
+}
+
+</script>
+
+</body>
+  </html>
