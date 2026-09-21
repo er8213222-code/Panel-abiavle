@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOFI GAME</title>
+<style>
+*{box-sizing:border-box;image-rendering:pixelated}
+body{margin:0;background:#08050d;color:#fff;font-family:"Courier New",monospace;overflow:hidden}
+.hidden{display:none!important}
+.screen{width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#inicio{background:#0d0713}
+.logo,.titulo{color:#ff4dcc;font-weight:bold;text-shadow:4px 4px #74115c}
+.logo{font-size:44px;margin-bottom:30px}
+.pixel-btn{background:#ff4dcc;color:white;border:4px solid #8c176f;padding:13px 25px;margin:7px;font-family:inherit;font-size:18px;font-weight:bold;cursor:pointer;box-shadow:6px 6px #35102d}
+.pixel-btn:active,.icon-btn:active,.puerta:active{transform:translate(4px,4px)}
+#casa{width:100vw;height:100vh;position:relative;background:url("file_00000000a69481f5ba236394483b8955.png") center/cover no-repeat}
+.vidas{position:absolute;top:12px;left:12px;padding:8px 12px;background:#000c;border:3px solid #ff4dcc;font-size:21px;z-index:10}
+.casa-botones{position:absolute;left:0;right:0;bottom:20px;display:flex;justify-content:space-between;padding:0 20px}
+.icon-btn{width:70px;height:70px;background:#ff4dcc;border:4px solid #8c176f;color:white;font-size:30px;font-weight:bold;box-shadow:5px 5px #35102d}
+#backrooms{background:#09060d;overflow:auto;padding:20px;justify-content:flex-start}
+.titulo{font-size:34px;margin-bottom:15px}
+.volver{align-self:flex-start}
+.mapa{width:min(600px,95vw);display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px auto 40px}
+.nivel{min-height:75px;background:#25152e;border:3px solid #ff4dcc;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:13px;font-weight:bold}
+#encuesta{background:#0e0715;padding:20px}
+.encuesta-box,.modal{width:min(500px,94vw);background:#160b1e;border:5px solid #ff4dcc;padding:25px;text-align:center;box-shadow:10px 10px #350f2e}
+.encuesta-pregunta{font-size:21px;margin:20px 0}.opciones{display:flex;flex-direction:column}
+.overlay{position:fixed;inset:0;background:#000e;display:flex;align-items:center;justify-content:center;z-index:100}
+.admin-abuse{color:red;font-size:clamp(40px,12vw,90px);font-weight:bold;text-shadow:5px 5px #5b0000;animation:abuse .55s infinite alternate}
+@keyframes abuse{from{transform:scale(.55)}to{transform:scale(1.15)}}
+.puertas{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.puerta{width:90px;height:150px;background:#702b70;border:5px solid #ff4dcc;color:white;font-family:inherit;font-weight:bold;cursor:pointer;box-shadow:6px 6px #35102d}
+.vigilancia-titulo,.sorpresa-titulo{color:#ff4dcc}
+#mensajeAdmin .modal{border-color:#50ff8b}
+</style>
+</head>
+<body>
+
+<section id="inicio" class="screen">
+<div class="logo">SOFI GAME</div>
+<button class="pixel-btn" onclick="jugar()">JUEGA</button>
+<button class="pixel-btn" onclick="morir()">MUERE</button>
+<div style="font-size:35px">0</div>
+</section>
+
+<section id="casa" class="hidden">
+<div class="vidas" id="vidas">❤️❤️❤️❤️❤️</div>
+<div class="casa-botones">
+<button class="icon-btn" onclick="abrirBackrooms()">☠</button>
+<button class="icon-btn" onclick="abrirEncuesta()">?</button>
+</div>
+</section>
+
+<section id="backrooms" class="screen hidden">
+<button class="pixel-btn volver" onclick="volverCasa()">← VOLVER</button>
+<div class="titulo">BACKROOMS</div>
+<div id="mapa" class="mapa"></div>
+</section>
+
+<section id="encuesta" class="screen hidden">
+<button class="pixel-btn volver" onclick="volverCasa()">← VOLVER</button>
+<div class="encuesta-box">
+<h2>ENCUESTA</h2>
+<div id="encuestaContenido">
+<div class="encuesta-pregunta">Esperando encuesta...</div>
+</div>
+</div>
+</section>
+
+<div id="abuse" class="overlay hidden">
+<div class="admin-abuse">ADMIN ABUSE!</div>
+</div>
+
+<div id="sorpresa" class="overlay hidden">
+<div class="modal">
+<h2 class="sorpresa-titulo">HABITACIÓN <span id="habitacion">1</span></h2>
+<p>Elige una puerta</p>
+<div class="puertas">
+<button class="puerta" onclick="elegirPuerta(1)">🚪<br><br>PUERTA 1</button>
+<button class="puerta" onclick="elegirPuerta(2)">🚪<br><br>PUERTA 2</button>
+<button class="puerta" onclick="elegirPuerta(3)">🚪<br><br>PUERTA 3</button>
+</div>
+<p id="vidasSorpresa">❤️❤️❤️❤️❤️</p>
+</div>
+</div>
+
+<div id="perdida" class="overlay hidden">
+<div class="modal">
+<h1>HAS PERDIDO UNA VIDA</h1>
+</div>
+</div>
+
+<div id="vigilancia" class="overlay hidden">
+<div class="modal">
+<h1 class="vigilancia-titulo">EMILIANO TE VIGILARÁ</h1>
+<p id="fechas"></p>
+</div>
+</div>
+
+<div id="muere" class="overlay hidden">
+<div class="modal">
+<h1>TE VA A VIGILAR EMILIANO DURANTE 2 HORAS</h1>
+<button class="pixel-btn" onclick="cerrarMuere()">OK</button>
+</div>
+</div>
+
+<div id="mensajeAdmin" class="overlay hidden">
+<div class="modal">
+<h2 id="mensajeTexto"></h2>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyBAw-UrRmhMIldpEE7kPbbpmUA034oTcrE",
+authDomain:"sofi-game.firebaseapp.com",
+projectId:"sofi-game",
+storageBucket:"sofi-game.firebasestorage.app",
+messagingSenderId:"322701500655",
+appId:"1:322701500655:web:36399b7d5575a4223cbb1a",
+measurementId:"G-XGXF5V5EPS"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db=firebase.firestore();
+const controlRef=db.collection("sofiGame").doc("control");
+
+const nivelesDefault=[
+"Tras Tiendas 0",
+"Caída a Vecindario",
+"Escaleras Interminables",
+"Hotel",
+"Pasillos Susurrantes",
+"Poolrooms",
+"Backrooms Espejo",
+"Paisaje",
+"Hello Kitty",
+"Hello Kitty Garden",
+"Ojos 3.14",
+"Simulación",
+"Nivel Fun",
+"Roba un Brainrot",
+"Bosque",
+"Pisos Flotantes"
+];
+
+let niveles=[...nivelesDefault];
+let survey=null;
+let puertasCorrectas=[1,2,3,1,2];
+let vidas=5;
+let habitacion=1;
+let lastMessageId=null;
+let lastSurpriseId=null;
+let messageTimer=null;
+
+function ocultarPantallas(){
+document.querySelectorAll("#inicio,#casa,#backrooms,#encuesta")
+.forEach(x=>x.classList.add("hidden"));
+}
+
+function jugar(){
+ocultarPantallas();
+document.getElementById("casa").classList.remove("hidden");
+}
+
+function volverCasa(){
+ocultarPantallas();
+document.getElementById("casa").classList.remove("hidden");
+}
+
+function abrirBackrooms(){
+ocultarPantallas();
+document.getElementById("backrooms").classList.remove("hidden");
+}
+
+function abrirEncuesta(){
+ocultarPantallas();
+document.getElementById("encuesta").classList.remove("hidden");
+}
+
+function morir(){
+document.getElementById("muere").classList.remove("hidden");
+}
+
+function cerrarMuere(){
+document.getElementById("muere").classList.add("hidden");
+}
+
+function renderNiveles(){
+const mapa=document.getElementById("mapa");
+mapa.innerHTML="";
+
+niveles.forEach((n,i)=>{
+const e=document.createElement("div");
+e.className="nivel";
+e.textContent=(i+1)+". "+n;
+mapa.appendChild(e);
+});
+}
+
+function renderEncuesta(){
+const box=document.getElementById("encuestaContenido");
+
+if(!survey||!survey.question){
+box.innerHTML='<div class="encuesta-pregunta">Esperando encuesta...</div>';
+return;
+}
+
+box.innerHTML="";
+
+const q=document.createElement("div");
+q.className="encuesta-pregunta";
+q.textContent=survey.question;
+box.appendChild(q);
+
+const opts=document.createElement("div");
+opts.className="opciones";
+
+(survey.options||[]).forEach((o,i)=>{
+if(!o)return;
+
+const b=document.createElement("button");
+b.className="pixel-btn";
+b.textContent=String.fromCharCode(65+i)+". "+o;
+b.onclick=()=>sonidoCorrecto();
+
+opts.appendChild(b);
+});
+
+box.appendChild(opts);
+}
+
+function actualizarVidas(){
+const s="❤️".repeat(Math.max(0,vidas))+
+"🖤".repeat(Math.max(0,5-vidas));
+
+document.getElementById("vidas").textContent=s;
+document.getElementById("vidasSorpresa").textContent=s;
+}
+
+function activarSorpresa(id){
+
+if(id===lastSurpriseId)return;
+
+lastSurpriseId=id;
+
+document.getElementById("abuse").classList.remove("hidden");
+
+setTimeout(()=>{
+
+document.getElementById("abuse").classList.add("hidden");
+
+habitacion=1;
+
+document.getElementById("habitacion").textContent=1;
+
+document.getElementById("sorpresa").classList.remove("hidden");
+
+actualizarVidas();
+
+},2200);
+}
+
+function elegirPuerta(numero){
+
+const correcta=puertasCorrectas[habitacion-1];
+
+if(numero===correcta){
+
+sonidoCorrecto();
+
+if(habitacion<5){
+
+habitacion++;
+
+document.getElementById("habitacion").textContent=habitacion;
+
+}else{
+
+document.getElementById("sorpresa").classList.add("hidden");
+
+}
+
+return;
+}
+
+vidas--;
+
+actualizarVidas();
+
+sonidoIncorrecto();
+
+document.getElementById("sorpresa").classList.add("hidden");
+
+if(vidas<=0){
+
+mostrarVigilancia();
+
+return;
+}
+
+document.getElementById("perdida").classList.remove("hidden");
+
+setTimeout(()=>{
+
+document.getElementById("perdida").classList.add("hidden");
+
+if(habitacion<5){
+
+habitacion++;
+
+document.getElementById("habitacion").textContent=habitacion;
+
+}
+
+document.getElementById("sorpresa").classList.remove("hidden");
+
+},1400);
+}
+
+function mostrarVigilancia(){
+
+const hoy=new Date();
+const f1=new Date(hoy);
+const f2=new Date(hoy);
+
+f1.setDate(hoy.getDate()+1);
+f2.setDate(hoy.getDate()+2);
+
+const o={
+day:"numeric",
+month:"long"
+};
+
+document.getElementById("fechas").textContent=
+"Del "+
+f1.toLocaleDateString("es-MX",o)+
+" al "+
+f2.toLocaleDateString("es-MX",o);
+
+document.getElementById("vigilancia").classList.remove("hidden");
+}
+
+function mostrarMensaje(m){
+
+if(!m||!m.text||m.id===lastMessageId)return;
+
+lastMessageId=m.id;
+
+document.getElementById("mensajeTexto").textContent=m.text;
+
+const el=document.getElementById("mensajeAdmin");
+
+el.classList.remove("hidden");
+
+clearTimeout(messageTimer);
+
+const dur=Number(m.duration);
+
+if(dur>0){
+
+messageTimer=setTimeout(
+()=>el.classList.add("hidden"),
+dur*1000
+);
+
+}
+}
+
+function sonido(f,d,t){
+
+try{
+
+const a=new AudioContext();
+const o=a.createOscillator();
+const g=a.createGain();
+
+o.type=t;
+o.frequency.value=f;
+g.gain.value=.12;
+
+o.connect(g);
+g.connect(a.destination);
+
+o.start();
+
+g.gain.exponentialRampToValueAtTime(
+.001,
+a.currentTime+d
+);
+
+o.stop(a.currentTime+d);
+
+}catch(e){}
+
+}
+
+function sonidoCorrecto(){
+sonido(600,.15,"square");
+}
+
+function sonidoIncorrecto(){
+sonido(90,.3,"sawtooth");
+
+setTimeout(
+()=>sonido(50,.3,"square"),
+120
+);
+}
+
+renderNiveles();
+renderEncuesta();
+actualizarVidas();
+
+controlRef.onSnapshot(s=>{
+
+if(!s.exists())return;
+
+const data=s.data();
+
+if(Array.isArray(data.levels)){
+niveles=data.levels;
+renderNiveles();
+}
+
+if(data.survey!==undefined){
+survey=data.survey;
+renderEncuesta();
+}
+
+if(data.message){
+mostrarMensaje(data.message);
+}
+
+if(data.surprise){
+
+if(
+Array.isArray(data.surprise.doors)&&
+data.surprise.doors.length===5
+){
+puertasCorrectas=data.surprise.doors;
+}
+
+if(
+data.surprise.enabled&&
+data.surprise.id
+){
+activarSorpresa(data.surprise.id);
+}
+
+}
+
+},err=>console.error("Firebase:",err));
+
+</script>
+</body>
+</html>
