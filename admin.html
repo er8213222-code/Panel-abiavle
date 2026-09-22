@@ -7,62 +7,18 @@
 
 <style>
 *{box-sizing:border-box}
-body{
-margin:0;
-background:#09040d;
-color:#fff;
-font-family:Courier New,monospace
-}
-.wrap{
-max-width:900px;
-margin:auto;
-padding:16px
-}
+body{margin:0;background:#09040d;color:#fff;font-family:Courier New,monospace}
+.wrap{max-width:900px;margin:auto;padding:16px}
 h1,h2{color:#ff43c4}
-.card{
-border:4px solid #8f2c79;
-background:#140914;
-padding:16px;
-margin:14px 0
-}
-button{
-border:3px solid #7d155f;
-background:#ff43c4;
-color:#fff;
-font-weight:900;
-padding:10px 14px;
-margin:5px;
-box-shadow:4px 4px #3a102f
-}
-input,textarea,select{
-width:100%;
-padding:10px;
-background:#09040d;
-color:#fff;
-border:3px solid #8f2c79;
-margin:5px 0 10px
-}
+.card{border:4px solid #8f2c79;background:#140914;padding:16px;margin:14px 0}
+button{border:3px solid #7d155f;background:#ff43c4;color:#fff;font-weight:900;padding:10px 14px;margin:5px;box-shadow:4px 4px #3a102f}
+input,textarea,select{width:100%;padding:10px;background:#09040d;color:#fff;border:3px solid #8f2c79;margin:5px 0 10px}
 textarea{min-height:90px}
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px
-}
-.status{
-padding:8px;
-border:3px solid #50ff8b;
-color:#50ff8b
-}
-.room{
-border:2px solid #69305e;
-padding:10px;
-margin:10px 0
-}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status{padding:8px;border:3px solid #50ff8b;color:#50ff8b}
+.room{border:2px solid #69305e;padding:10px;margin:10px 0}
 .sel{background:#7d155f}
-
-@media(max-width:600px){
-.grid{grid-template-columns:1fr}
-}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -75,7 +31,6 @@ margin:10px 0
 <div id="status" class="status">
 ● Conectando...
 </div>
-
 
 <div class="card">
 
@@ -93,7 +48,6 @@ GUARDAR NIVELES
 
 </div>
 
-
 <div class="card">
 
 <h2>❓ Encuesta</h2>
@@ -101,37 +55,24 @@ GUARDAR NIVELES
 <textarea id="question" placeholder="Pregunta"></textarea>
 
 <div class="grid">
-
 <input id="a" placeholder="A">
 <input id="b" placeholder="B">
 <input id="c" placeholder="C">
 <input id="d" placeholder="D">
-
 </div>
 
 <select id="correct">
-
-<option value="">
-Sin respuesta correcta
-</option>
-
+<option value="">Sin respuesta correcta</option>
 <option value="0">A</option>
 <option value="1">B</option>
 <option value="2">C</option>
 <option value="3">D</option>
-
 </select>
 
-<button id="saveSurvey">
-PUBLICAR
-</button>
-
-<button id="clearSurvey">
-QUITAR
-</button>
+<button id="saveSurvey">PUBLICAR</button>
+<button id="clearSurvey">QUITAR</button>
 
 </div>
-
 
 <div class="card">
 
@@ -139,13 +80,7 @@ QUITAR
 
 <textarea id="message" placeholder="Mensaje para Sofi"></textarea>
 
-<input
-id="duration"
-type="number"
-min="0"
-max="60"
-value="5"
->
+<input id="duration" type="number" min="0" max="60" value="5">
 
 <button id="send">
 MOSTRAR MENSAJE
@@ -153,14 +88,11 @@ MOSTRAR MENSAJE
 
 </div>
 
-
 <div class="card">
 
 <h2>🚨 ADMIN ABUSE</h2>
 
-<p>
-5 habitaciones · 3 puertas · 5 vidas
-</p>
+<p>5 habitaciones · 3 puertas · 5 vidas</p>
 
 <div id="rooms"></div>
 
@@ -178,53 +110,33 @@ ACTIVAR ADMIN ABUSE
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-
 
 <script>
 
-const firebaseConfig = {
-
-apiKey:
-"AIzaSyBAw-UrRmhMIldpEE7kPbbpmUA034oTcrE",
-
-authDomain:
-"sofi-game.firebaseapp.com",
-
-projectId:
-"sofi-game",
-
-storageBucket:
-"sofi-game.firebasestorage.app",
-
-messagingSenderId:
-"322701500655",
-
-appId:
-"1:322701500655:web:36399b7d5575a4223cbb1a",
-
-measurementId:
-"G-XGXF5V5EPS"
-
+const firebaseConfig={
+apiKey:"AIzaSyBAw-UrRmhMIldpEE7kPbbpmUA034oTcrE",
+authDomain:"sofi-game.firebaseapp.com",
+projectId:"sofi-game",
+storageBucket:"sofi-game.firebasestorage.app",
+messagingSenderId:"322701500655",
+appId:"1:322701500655:web:36399b7d5575a4223cbb1a",
+measurementId:"G-XGXF5V5EPS"
 };
-
 
 firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
+const db=firebase.firestore();
 
-const ref =
-db.collection("sofiGame").doc("control");
-
-
-const $ = id =>
-document.getElementById(id);
+const ref=db
+.collection("sofiGame")
+.doc("control");
 
 
-let data = {
+const $=id=>document.getElementById(id);
 
-levels:[
+
+let niveles=[
 "Tras Tiendas 0",
 "Caída a Vecindario",
 "Escaleras Interminables",
@@ -241,185 +153,146 @@ levels:[
 "Roba un Brainrot",
 "Bosque",
 "Pisos Flotantes"
-],
+];
 
-survey:null,
+let puertas=[1,2,3,1,2];
 
-message:null,
-
-surprise:{
-enabled:false,
-doors:[1,2,3,1,2]
-}
-
-};
+let cargando=true;
 
 
 /* FIREBASE */
 
-ref.onSnapshot(
+ref.onSnapshot(snap=>{
 
-snap => {
+if(!snap.exists()){
 
-if(snap.exists()){
+renderNiveles();
+renderPuertas();
 
-const firebaseData =
-snap.data();
+$("status").textContent=
+"● Documento no existe";
 
-data = {
-...data,
-...firebaseData
-};
+cargando=false;
+
+return;
 
 }
 
-render();
+const datos=snap.data();
 
-$("status").textContent =
+
+/* SOLO CARGAMOS NIVELES SI NO ESTAMOS EDITANDO */
+
+if(cargando){
+
+if(Array.isArray(datos.levels)){
+niveles=[...datos.levels];
+}
+
+if(
+datos.surprise &&
+Array.isArray(datos.surprise.doors)
+){
+puertas=[...datos.surprise.doors];
+}
+
+}
+
+renderNiveles();
+renderPuertas();
+
+cargarEncuesta(datos.survey);
+
+$("status").textContent=
 "● Firebase conectado";
 
-},
+cargando=false;
 
-error => {
+},
+error=>{
 
 console.error(error);
 
-$("status").textContent =
+$("status").textContent=
 "● ERROR DE FIREBASE";
 
-}
+});
 
-);
-
-
-/* RENDER */
-
-function render(){
 
 /* NIVELES */
 
-$("levels").innerHTML =
-data.levels.map(
+function renderNiveles(){
 
-(n,i) => `
+$("levels").innerHTML="";
 
-<div>
+niveles.forEach((nivel,i)=>{
 
-<b>${i+1}.</b>
+const fila=document.createElement("div");
 
-<input
-class="nivelInput"
-value="${esc(n)}"
->
+const numero=document.createElement("b");
 
-</div>
+numero.textContent=(i+1)+". ";
 
-`
+const input=document.createElement("input");
 
-).join("");
+input.className="nivelInput";
 
+input.value=nivel;
 
-/* PUERTAS */
+input.addEventListener("input",()=>{
 
-$("rooms").innerHTML =
-data.surprise.doors.map(
+niveles[i]=input.value;
 
-(v,i) => `
+});
 
-<div class="room">
+fila.appendChild(numero);
 
-<b>
-HABITACIÓN ${i+1}
-</b>
+fila.appendChild(input);
 
-<br>
+$("levels").appendChild(fila);
 
-${[1,2,3].map(
-
-n => `
-
-<button
-class="${v===n?"sel":""}"
-onclick="door(${i},${n})"
->
-
-PUERTA ${n}
-
-</button>
-
-`
-
-).join("")}
-
-</div>
-
-`
-
-).join("");
-
-
-/* ENCUESTA */
-
-if(data.survey){
-
-$("question").value =
-data.survey.question || "";
-
-["a","b","c","d"].forEach(
-
-(id,i)=>{
-
-$(id).value =
-data.survey.options?.[i] || "";
-
-}
-
-);
-
-$("correct").value =
-data.survey.correct ?? "";
-
-}
+});
 
 }
 
 
 /* GUARDAR NIVELES */
 
-$("saveLevels").onclick =
-async ()=>{
+$("saveLevels").onclick=async()=>{
 
-const niveles =
-[
-...document.querySelectorAll(
-".nivelInput"
-)
-]
+const inputs=
+document.querySelectorAll(".nivelInput");
 
-.map(x=>x.value.trim())
-.filter(Boolean);
+const nuevos=[];
 
+inputs.forEach(input=>{
+
+const valor=input.value.trim();
+
+if(valor){
+nuevos.push(valor);
+}
+
+});
 
 try{
 
-await ref.set(
+await ref.set({
 
-{
-levels:niveles
-},
+levels:nuevos
 
-{merge:true}
+},{merge:true});
 
-);
+niveles=[...nuevos];
 
-$("status").textContent =
+$("status").textContent=
 "● NIVELES GUARDADOS";
 
 }catch(error){
 
 console.error(error);
 
-$("status").textContent =
+$("status").textContent=
 "● ERROR AL GUARDAR";
 
 }
@@ -427,29 +300,45 @@ $("status").textContent =
 };
 
 
-/* AGREGAR */
+/* AGREGAR NIVEL */
 
-$("add").onclick =
-()=>{
+$("add").onclick=()=>{
 
-data.levels.push(
-"Nuevo nivel"
-);
+niveles.push("Nuevo nivel");
 
-render();
+renderNiveles();
 
 };
 
 
 /* ENCUESTA */
 
-$("saveSurvey").onclick =
-async ()=>{
+function cargarEncuesta(survey){
 
-const encuesta = {
+if(!survey)return;
 
-question:
-$("question").value.trim(),
+$("question").value=
+survey.question||"";
+
+const opciones=
+survey.options||[];
+
+$("a").value=opciones[0]||"";
+$("b").value=opciones[1]||"";
+$("c").value=opciones[2]||"";
+$("d").value=opciones[3]||"";
+
+$("correct").value=
+survey.correct??"";
+
+}
+
+
+$("saveSurvey").onclick=async()=>{
+
+const encuesta={
+
+question:$("question").value.trim(),
 
 options:[
 $("a").value,
@@ -458,41 +347,31 @@ $("c").value,
 $("d").value
 ],
 
-correct:
-$("correct").value
+correct:$("correct").value
 
 };
 
-await ref.set(
+await ref.set({
 
-{
 survey:encuesta
-},
 
-{merge:true}
+},{merge:true});
 
-);
-
-$("status").textContent =
+$("status").textContent=
 "● ENCUESTA GUARDADA";
 
 };
 
 
-$("clearSurvey").onclick =
-async ()=>{
+$("clearSurvey").onclick=async()=>{
 
-await ref.set(
+await ref.set({
 
-{
 survey:null
-},
 
-{merge:true}
+},{merge:true});
 
-);
-
-$("status").textContent =
+$("status").textContent=
 "● ENCUESTA QUITADA";
 
 };
@@ -500,33 +379,26 @@ $("status").textContent =
 
 /* MENSAJE */
 
-$("send").onclick =
-async ()=>{
+$("send").onclick=async()=>{
 
-const mensaje = {
+const mensaje={
 
-text:
-$("message").value.trim(),
+text:$("message").value.trim(),
 
 duration:
 Number($("duration").value)||0,
 
-id:
-Date.now()
+id:Date.now()
 
 };
 
-await ref.set(
+await ref.set({
 
-{
 message:mensaje
-},
 
-{merge:true}
+},{merge:true});
 
-);
-
-$("status").textContent =
+$("status").textContent=
 "● MENSAJE ENVIADO";
 
 };
@@ -534,33 +406,61 @@ $("status").textContent =
 
 /* PUERTAS */
 
-window.door =
-(i,n)=>{
+function renderPuertas(){
 
-data.surprise.doors[i]=n;
+$("rooms").innerHTML="";
 
-render();
+puertas.forEach((correcta,i)=>{
+
+const room=document.createElement("div");
+
+room.className="room";
+
+room.innerHTML=
+"<b>HABITACIÓN "+(i+1)+"</b><br>";
+
+[1,2,3].forEach(numero=>{
+
+const boton=document.createElement("button");
+
+boton.textContent=
+"PUERTA "+numero;
+
+if(correcta===numero){
+boton.className="sel";
+}
+
+boton.onclick=()=>{
+
+puertas[i]=numero;
+
+renderPuertas();
 
 };
 
+room.appendChild(boton);
 
-$("saveDoors").onclick =
-async ()=>{
+});
 
-await ref.set(
+$("rooms").appendChild(room);
 
-{
-surprise:{
-...data.surprise,
-doors:data.surprise.doors
+});
+
 }
-},
 
-{merge:true}
 
-);
+$("saveDoors").onclick=async()=>{
 
-$("status").textContent =
+await ref.set({
+
+surprise:{
+enabled:false,
+doors:[...puertas]
+}
+
+},{merge:true});
+
+$("status").textContent=
 "● PUERTAS GUARDADAS";
 
 };
@@ -568,51 +468,25 @@ $("status").textContent =
 
 /* ADMIN ABUSE */
 
-$("activate").onclick =
-async ()=>{
+$("activate").onclick=async()=>{
 
-const sorpresa = {
+await ref.set({
 
-...data.surprise,
-
+surprise:{
 enabled:true,
-
+doors:[...puertas],
 id:Date.now()
+}
 
-};
+},{merge:true});
 
-await ref.set(
-
-{
-surprise:sorpresa
-},
-
-{merge:true}
-
-);
-
-$("status").textContent =
+$("status").textContent=
 "● ADMIN ABUSE ACTIVADO";
 
 };
 
-
-/* ESCAPAR TEXTO */
-
-function esc(s){
-
-return String(s ?? "")
-.replace(/&/g,"&amp;")
-.replace(/"/g,"&quot;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;");
-
-}
-
-
-/* INICIO */
-
-render();
+renderNiveles();
+renderPuertas();
 
 </script>
 
