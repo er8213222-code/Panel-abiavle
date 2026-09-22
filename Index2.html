@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SOFI GAME</title>
+
+<style>
+*{
+box-sizing:border-box;
+image-rendering:pixelated;
+}
+
+body{
+margin:0;
+background:#08050d;
+color:white;
+font-family:"Courier New",monospace;
+overflow:hidden;
+}
+
+.hidden{
+display:none!important;
+}
+
+.screen{
+width:100vw;
+height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+#inicio{
+background:#0d0713;
+}
+
+.logo{
+color:#ff4dcc;
+font-size:45px;
+font-weight:bold;
+text-shadow:4px 4px #74115c;
+margin-bottom:30px;
+}
+
+.pixel-btn{
+background:#ff4dcc;
+color:white;
+border:4px solid #8c176f;
+padding:13px 25px;
+margin:7px;
+font-family:inherit;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+box-shadow:6px 6px #35102d;
+}
+
+.pixel-btn:active{
+transform:translate(4px,4px);
+}
+
+#casa{
+width:100vw;
+height:100vh;
+position:relative;
+background:url("file_00000000a69481f5ba236394483b8955.png") center/cover no-repeat;
+}
+
+.casa-botones{
+position:absolute;
+left:0;
+right:0;
+bottom:20px;
+display:flex;
+justify-content:space-between;
+padding:0 20px;
+}
+
+.icon-btn{
+width:70px;
+height:70px;
+background:#ff4dcc;
+border:4px solid #8c176f;
+color:white;
+font-size:30px;
+font-weight:bold;
+box-shadow:5px 5px #35102d;
+cursor:pointer;
+}
+
+#backrooms,
+#encuesta{
+background:#09060d;
+padding:20px;
+}
+
+#backrooms{
+overflow:auto;
+justify-content:flex-start;
+}
+
+.titulo{
+color:#ff4dcc;
+font-size:34px;
+font-weight:bold;
+text-shadow:4px 4px #74115c;
+margin:15px;
+}
+
+.volver{
+align-self:flex-start;
+}
+
+.mapa{
+width:min(600px,95vw);
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin:10px auto 40px;
+}
+
+.nivel{
+min-height:75px;
+background:#25152e;
+border:3px solid #ff4dcc;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:8px;
+font-size:13px;
+font-weight:bold;
+}
+
+.encuesta-box,
+.modal{
+width:min(500px,94vw);
+background:#160b1e;
+border:5px solid #ff4dcc;
+padding:25px;
+text-align:center;
+box-shadow:10px 10px #350f2e;
+}
+
+.encuesta-pregunta{
+font-size:21px;
+margin:20px 0;
+}
+
+.opciones{
+display:flex;
+flex-direction:column;
+}
+
+.overlay{
+position:fixed;
+inset:0;
+background:#000e;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:100;
+}
+
+#accesoAdmin .modal{
+border-color:#ff4dcc;
+}
+
+.error{
+color:#ff3030;
+font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<!-- INICIO -->
+
+<section id="inicio" class="screen">
+
+<div class="logo">
+SOFI GAME
+</div>
+
+<button class="pixel-btn" onclick="jugar()">
+JUEGA
+</button>
+
+<button class="pixel-btn" onclick="morir()">
+MUERE
+</button>
+
+<div style="font-size:35px">
+0
+</div>
+
+</section>
+
+
+<!-- CASA -->
+
+<section id="casa" class="hidden">
+
+<div class="casa-botones">
+
+<button
+class="icon-btn"
+onclick="abrirBackrooms()">
+☠
+</button>
+
+<button
+class="icon-btn"
+onclick="abrirEncuesta()">
+?
+</button>
+
+</div>
+
+</section>
+
+
+<!-- BACKROOMS -->
+
+<section id="backrooms" class="screen hidden">
+
+<button
+class="pixel-btn volver"
+onclick="volverCasa()">
+← VOLVER
+</button>
+
+<div class="titulo">
+BACKROOMS
+</div>
+
+<div
+id="mapa"
+class="mapa">
+</div>
+
+</section>
+
+
+<!-- ENCUESTA -->
+
+<section id="encuesta" class="screen hidden">
+
+<button
+class="pixel-btn volver"
+onclick="volverCasa()">
+← VOLVER
+</button>
+
+<div class="encuesta-box">
+
+<h2>ENCUESTA</h2>
+
+<div id="encuestaContenido">
+
+<div class="encuesta-pregunta">
+Esperando encuesta...
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- MUERE -->
+
+<div
+id="muere"
+class="overlay hidden">
+
+<div class="modal">
+
+<h1>
+TE VA A VIGILAR EMILIANO DURANTE 2 HORAS
+</h1>
+
+<button
+class="pixel-btn"
+onclick="cerrarMuere()">
+OK
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ACCESO ADMIN -->
+
+<div
+id="accesoAdmin"
+class="overlay hidden">
+
+<div class="modal">
+
+<h2>
+🔐 ACCESO ADMIN
+</h2>
+
+<p>
+Introduce el código
+</p>
+
+<input
+id="codigoAdmin"
+type="password"
+inputmode="numeric"
+maxlength="4"
+style="
+width:100%;
+padding:15px;
+font-size:25px;
+text-align:center;
+background:#09040d;
+color:white;
+border:3px solid #ff43c4;
+">
+
+<div
+id="errorAdmin"
+class="error">
+</div>
+
+<button
+class="pixel-btn"
+onclick="comprobarCodigo()">
+ENTRAR
+</button>
+
+</div>
+
+</div>
+
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+<script>
+
+/* FIREBASE */
+
+const firebaseConfig={
+
+apiKey:
+"AIzaSyBAw-UrRmhMIldpEE7kPbbpmUA034oTcrE",
+
+authDomain:
+"sofi-game.firebaseapp.com",
+
+projectId:
+"sofi-game",
+
+storageBucket:
+"sofi-game.firebasestorage.app",
+
+messagingSenderId:
+"322701500655",
+
+appId:
+"1:322701500655:web:36399b7d5575a4223cbb1a",
+
+measurementId:
+"G-XGXF5V5EPS"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db=firebase.firestore();
+
+const controlRef=
+db.collection("sofiGame").doc("control");
+
+
+/* NIVELES */
+
+let niveles=[
+
+"Tras Tiendas 0",
+"Caída a Vecindario",
+"Escaleras Interminables",
+"Hotel",
+"Pasillos Susurrantes",
+"Poolrooms",
+"Backrooms Espejo",
+"Paisaje",
+"Hello Kitty",
+"Hello Kitty Garden",
+"Ojos 3.14",
+"Simulación",
+"Nivel Fun",
+"Roba un Brainrot",
+"Bosque",
+"Pisos Flotantes"
+
+];
+
+
+/* ENCUESTA */
+
+let encuesta=null;
+
+
+/* PATRÓN SECRETO */
+
+let patron=[];
+
+const patronCorrecto=[
+
+"niveles",
+"volver",
+"encuesta",
+"volver",
+"encuesta",
+"volver",
+"niveles"
+
+];
+
+
+/* FIREBASE EN TIEMPO REAL */
+
+controlRef.onSnapshot(
+
+snap=>{
+
+if(!snap.exists())
+return;
+
+const datos=snap.data();
+
+
+if(Array.isArray(datos.levels)){
+
+niveles=[
+...datos.levels
+];
+
+renderNiveles();
+
+}
+
+
+if(datos.survey!==undefined){
+
+encuesta=
+datos.survey;
+
+renderEncuesta();
+
+}
+
+},
+
+error=>{
+
+console.error(
+"Firebase:",
+error
+);
+
+}
+
+);
+
+
+/* PANTALLAS */
+
+function ocultar(){
+
+document
+.querySelectorAll(
+"#inicio,#casa,#backrooms,#encuesta"
+)
+.forEach(
+x=>x.classList.add("hidden")
+);
+
+}
+
+
+function jugar(){
+
+ocultar();
+
+document
+.getElementById("casa")
+.classList.remove("hidden");
+
+}
+
+
+function volverCasa(){
+
+registrarPatron("volver");
+
+ocultar();
+
+document
+.getElementById("casa")
+.classList.remove("hidden");
+
+}
+
+
+function abrirBackrooms(){
+
+registrarPatron("niveles");
+
+ocultar();
+
+document
+.getElementById("backrooms")
+.classList.remove("hidden");
+
+}
+
+
+function abrirEncuesta(){
+
+registrarPatron("encuesta");
+
+ocultar();
+
+document
+.getElementById("encuesta")
+.classList.remove("hidden");
+
+}
+
+
+/* MUERE */
+
+function morir(){
+
+document
+.getElementById("muere")
+.classList.remove("hidden");
+
+}
+
+
+function cerrarMuere(){
+
+document
+.getElementById("muere")
+.classList.add("hidden");
+
+}
+
+
+/* NIVELES */
+
+function renderNiveles(){
+
+const mapa=
+document.getElementById("mapa");
+
+mapa.innerHTML="";
+
+niveles.forEach(
+
+(n,i)=>{
+
+const div=
+document.createElement("div");
+
+div.className="nivel";
+
+div.textContent=
+(i+1)+". "+n;
+
+mapa.appendChild(div);
+
+}
+
+);
+
+}
+
+
+/* ENCUESTA */
+
+function renderEncuesta(){
+
+const box=
+document.getElementById(
+"encuestaContenido"
+);
+
+if(!encuesta){
+
+box.innerHTML=
+`
+<div class="encuesta-pregunta">
+Esperando encuesta...
+</div>
+`;
+
+return;
+
+}
+
+box.innerHTML="";
+
+
+const pregunta=
+document.createElement("div");
+
+pregunta.className=
+"encuesta-pregunta";
+
+pregunta.textContent=
+encuesta.question||"";
+
+box.appendChild(pregunta);
+
+
+const opciones=
+document.createElement("div");
+
+opciones.className="opciones";
+
+
+(encuesta.options||[])
+.forEach(
+
+(opcion,i)=>{
+
+if(!opcion)
+return;
+
+const boton=
+document.createElement("button");
+
+boton.className=
+"pixel-btn";
+
+boton.textContent=
+String.fromCharCode(65+i)
++". "+opcion;
+
+opciones.appendChild(boton);
+
+}
+
+);
+
+
+box.appendChild(opciones);
+
+}
+
+
+/* PATRÓN SECRETO */
+
+function registrarPatron(paso){
+
+patron.push(paso);
+
+
+/* Si se pasa, dejamos solamente
+los últimos movimientos */
+
+if(patron.length>
+patronCorrecto.length){
+
+patron.shift();
+
+}
+
+
+/* Comprobar */
+
+if(
+
+patron.length===
+patronCorrecto.length
+
+&&
+
+patron.every(
+(x,i)=>
+x===patronCorrecto[i]
+)
+
+){
+
+patron=[];
+
+abrirAccesoAdmin();
+
+}
+
+}
+
+
+/* ACCESO */
+
+function abrirAccesoAdmin(){
+
+document
+.getElementById("accesoAdmin")
+.classList
+.remove("hidden");
+
+document
+.getElementById("codigoAdmin")
+.value="";
+
+document
+.getElementById("errorAdmin")
+.textContent="";
+
+setTimeout(
+
+()=>document
+.getElementById("codigoAdmin")
+.focus(),
+
+100
+
+);
+
+}
+
+
+/* COMPROBAR CÓDIGO */
+
+function comprobarCodigo(){
+
+const codigo=
+document
+.getElementById("codigoAdmin")
+.value;
+
+
+if(codigo==="1590"){
+
+window.location.href=
+"admin.html";
+
+return;
+
+}
+
+
+document
+.getElementById("errorAdmin")
+textContent=
+"❌ CÓDIGO INCORRECTO";
+
+
+patron=[];
+
+}
+
+
+/* ENTER */
+
+document
+.getElementById("codigoAdmin")
+.addEventListener(
+
+"keydown",
+
+e=>{
+
+if(e.key==="Enter"){
+
+comprobarCodigo();
+
+}
+
+});
+
+
+/* INICIO */
+
+renderNiveles();
+
+renderEncuesta();
+
+</script>
+
+</body>
+</html>
